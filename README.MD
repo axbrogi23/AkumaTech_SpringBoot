@@ -1,253 +1,366 @@
-# AkumaTech — Backend
+# AkumaTech - Tienda Gamer
 
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Java](https://img.shields.io/badge/Java-27-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Gradle](https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=20232A)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=20232A)
+![Vitest](https://img.shields.io/badge/Vitest-3-729B1B?logo=vitest&logoColor=white)
 
-Backend REST desarrollado con Spring Boot para la tienda gamer **AkumaTech**. La interfaz web corresponde al proyecto [AkumaTech React](https://github.com/rogodoyr/Akuma_tech_React), que usa este backend para migrar la gestión de usuarios desde `localStorage` hacia una API persistente.
+Aplicación web de una tienda de productos tecnológicos y gamer. Permite explorar un catálogo, agregar productos al carrito, aplicar descuentos, seleccionar envío, iniciar sesión, registrar usuarios, consultar pedidos y acceder a herramientas administrativas.
 
-## Estado actual
+Proyecto desarrollado para **Fullstack II - Duoc UC** con una interfaz construida en React y un backend independiente.
 
-La primera versión implementada cubre la autenticación de usuarios:
+## Tabla de contenidos
 
-- Registro de usuarios.
-- Inicio de sesión con verificación de contraseña.
-- Generación de tokens JWT.
-- Eliminación lógica mediante el campo `active`.
-- Persistencia de usuarios en PostgreSQL.
-- Migración inicial de la tabla `users` con Flyway.
-- Validación de correos y campos obligatorios.
+- [Características](#características)
+- [Arquitectura de la aplicación](#arquitectura-de-la-aplicación)
+- [Navegación y páginas](#navegación-y-páginas)
+- [Flujo de compra](#flujo-de-compra)
+- [Autenticación y autorización](#autenticación-y-autorización)
+- [Estado y persistencia](#estado-y-persistencia)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Stack tecnológico](#stack-tecnológico)
+- [Requisitos](#requisitos)
+- [Instalación y ejecución](#instalación-y-ejecución)
+- [Configuración del backend](#configuración-del-backend)
+- [Catálogo y promociones](#catálogo-y-promociones)
+- [Pruebas](#pruebas)
+- [Scripts disponibles](#scripts-disponibles)
+- [Documentación adicional](#documentación-adicional)
+- [Notas de implementación](#notas-de-implementación)
 
-## Tecnologías
+## Características
 
-| Capa | Tecnología |
+- Catálogo de 14 productos gamer y componentes de hardware.
+- Carrusel de ofertas en la página de inicio.
+- Carrito persistente con cantidades, subtotal y total.
+- Códigos de descuento y tres modalidades de envío.
+- Registro con validación de nombre, RUT chileno, correo, contraseña y teléfono.
+- Inicio de sesión mediante una API REST.
+- Historial de pedidos asociado al correo del usuario.
+- Reposición de pedidos anteriores al carrito.
+- Panel de administración con estadísticas.
+- Gestión de productos y usuarios.
+- Diseño adaptable para escritorio y dispositivos móviles.
+- Pruebas de componentes, contextos, rutas, validaciones y accesibilidad.
+
+## Arquitectura de la aplicación
+
+La interfaz sigue una arquitectura basada en componentes de React y contextos globales. No utiliza React Router: `App.jsx` administra el identificador de la página activa y pasa la función `navegar` a las vistas y componentes.
+
+```mermaid
+flowchart TB
+    User[Usuario] --> Main[src/main.jsx]
+    Main --> App[src/App.jsx]
+    App --> Header[Header]
+    App --> RouterInterno{Página activa}
+    App --> Footer[Footer]
+
+    RouterInterno --> Inicio[Inicio]
+    RouterInterno --> Login[Login]
+    RouterInterno --> Registro[Registro]
+    RouterInterno --> Carrito[Carrito]
+    RouterInterno --> Pedidos[MisPedidos]
+    RouterInterno --> Admin[Administración]
+
+    App --> SessionProvider[SesionProvider]
+    App --> CartProvider[CarritoProvider]
+
+    SessionProvider --> AuthAPI[API REST de autenticación]
+    SessionProvider --> SessionStorage[localStorage]
+    CartProvider --> ProductData[Catálogo y descuentos]
+    CartProvider --> CartStorage[localStorage]
+
+    Inicio --> Carousel[Carrusel]
+    Inicio --> ProductCard[ProductoCard]
+    ProductCard --> CartProvider
+    Carrito --> SessionProvider
+    Pedidos --> SessionProvider
+    Pedidos --> CartProvider
+    Admin --> SessionProvider
+    Admin --> CartProvider
+```
+
+### Responsabilidades principales
+
+| Capa | Responsabilidad |
 |---|---|
-| API | Spring Boot Web MVC |
-| Seguridad | Spring Security + BCrypt |
-| Autenticación | JSON Web Token (JJWT 0.12.6) |
-| Persistencia | Spring Data JPA + Hibernate |
-| Base de datos | PostgreSQL |
-| Migraciones | Flyway |
-| Validación | Jakarta Validation |
-| Build | Gradle |
-| Lenguaje | Java 27 |
+| `main.jsx` | Crea el árbol React e inicializa la aplicación. |
+| `App.jsx` | Compone la aplicación y controla la navegación interna mediante estado. |
+| `components/` | Renderiza elementos reutilizables como navegación, pie de página, carrusel y tarjeta de producto. |
+| `pages/` | Implementa las vistas completas de la aplicación. |
+| `context/` | Comparte sesión y estado del carrito entre componentes. |
+| `data/` | Contiene el catálogo inicial, descuentos y opciones de envío. |
+| `utils/` | Centraliza validaciones chilenas y operaciones de `localStorage`. |
+| `tests/` | Verifica componentes, contextos, navegación y accesibilidad. |
 
-## Arquitectura
+## Navegación y páginas
+
+La navegación actual usa valores de estado como `inicio`, `login`, `registro`, `carrito`, `mis-pedidos`, `admin`, `admin-productos` y `admin-usuarios`.
+
+| Página o componente | Identificador | Función |
+|---|---|---|
+| Inicio | `inicio` | Muestra carrusel y catálogo. |
+| Login | `login` | Valida credenciales y obtiene el token de autenticación. |
+| Registro | `registro` | Registra un usuario mediante la API. |
+| Carrito | `carrito` | Gestiona cantidades, envío, descuento y pedido. |
+| MisPedidos | `mis-pedidos` | Consulta pedidos del usuario autenticado. |
+| Admin | `admin` | Muestra estadísticas y acciones administrativas. |
+| AdminProductos | `admin-productos` | Crea, modifica y elimina productos. |
+| AdminUsuarios | `admin-usuarios` | Crea, modifica y elimina usuarios locales. |
+| Header | - | Navegación, sesión activa y contador del carrito. |
+| Footer | - | Información y enlaces de la tienda. |
+| Carrusel | - | Presenta promociones rotativas. |
+| ProductoCard | - | Presenta producto y permite agregarlo al carrito. |
+
+## Flujo de compra
+
+```mermaid
+sequenceDiagram
+    actor Usuario
+    participant Inicio
+    participant CarritoContext
+    participant Carrito
+    participant SesionContext
+    participant Storage
+
+    Usuario->>Inicio: Selecciona un producto
+    Inicio->>CarritoContext: agregarAlCarrito(id)
+    CarritoContext->>Storage: Persiste el carrito
+    Usuario->>Carrito: Abre el carrito
+    Usuario->>Carrito: Modifica cantidades o aplica descuento
+    Usuario->>Carrito: Selecciona envío y paga
+    Carrito->>SesionContext: Verifica la sesión
+
+    alt Sin sesión
+        Carrito-->>Usuario: Solicita iniciar sesión
+        Usuario->>SesionContext: Inicia sesión
+    else Sesión activa
+        Carrito->>Storage: Guarda pedidos_akuma
+        CarritoContext->>CarritoContext: Vacía el carrito
+        Carrito-->>Usuario: Muestra número de pedido
+    end
+```
+
+El checkout exige una sesión activa. Luego genera un número de pedido y guarda el pedido en `localStorage` bajo `pedidos_akuma`. El carrito se vacía después de completar la operación.
+
+## Autenticación y autorización
+
+`SesionContext` expone:
+
+- `sesion`: usuario autenticado.
+- `usuarios`: usuarios mantenidos localmente.
+- `iniciarSesion(correo, password)`: realiza el login contra la API.
+- `registrarUsuario(datos)`: realiza el registro contra la API.
+- `cerrarSesion()`: elimina sesión y token.
+- `esAdmin()`: verifica si el rol de sesión es `admin`.
+- `guardarUsuarios(lista)`: guarda y actualiza usuarios locales.
+
+El registro envía `email` y `password` a la API. El login recibe un token y construye una sesión local con nombre derivado del correo y rol `usuario`.
+
+Las páginas administrativas deben mostrar acceso restringido si no existe una sesión con rol `admin`.
+
+## Estado y persistencia
+
+La aplicación usa `React Context` para compartir información y `localStorage` para mantener datos entre recargas.
+
+| Clave | Contenido |
+|---|---|
+| `sesionActiva` | Sesión visible por la aplicación. |
+| `akuma_token` | Token recibido desde el backend. |
+| `carrito` | Productos, precio e cantidad del carrito. |
+| `productos` | Catálogo administrable por la interfaz. |
+| `usuarios` | Usuarios utilizados por las funciones administrativas locales. |
+| `pedidos_akuma` | Historial de pedidos realizado desde el frontend. |
+
+Las funciones `leerStorage`, `guardarStorage` y `eliminarStorage` encapsulan la lectura y escritura de datos JSON.
+
+> El almacenamiento en el navegador es adecuado para una entrega académica o prototipo. Para producción, usuarios, roles, productos y pedidos deberían gestionarse íntegramente por el backend.
+
+## Estructura del proyecto
 
 ```text
-src/main/java/com/akuma/tech/
-├── TechApplication.java
-└── auth/
-    ├── controller/    # Endpoints REST
-    ├── dto/           # Request y response DTO
-    ├── model/         # Entidad User
-    ├── repository/    # Acceso a datos JPA
-    ├── service/       # Lógica de autenticación y JWT
-    └── config/        # Seguridad y codificación BCrypt
+Akuma_tech_React-main/
+├── public/
+│   └── Recursos públicos de imagen y video
+├── src/
+│   ├── assets/
+│   │   └── Imágenes importadas por Vite
+│   ├── components/
+│   │   ├── Carrusel.jsx
+│   │   ├── Footer.jsx
+│   │   ├── Header.jsx
+│   │   └── ProductoCard.jsx
+│   ├── context/
+│   │   ├── CarritoContext.jsx
+│   │   └── SesionContext.jsx
+│   ├── data/
+│   │   └── productos.js
+│   ├── pages/
+│   │   ├── Admin.jsx
+│   │   ├── AdminProductos.jsx
+│   │   ├── AdminUsuarios.jsx
+│   │   ├── Carrito.jsx
+│   │   ├── Inicio.jsx
+│   │   ├── Login.jsx
+│   │   ├── MisPedidos.jsx
+│   │   └── Registro.jsx
+│   ├── tests/
+│   │   └── Pruebas de componentes, contexto y flujos
+│   ├── utils/
+│   │   ├── storage.js
+│   │   └── validaciones.js
+│   ├── App.jsx
+│   ├── App.css
+│   ├── index.css
+│   ├── main.jsx
+│   └── setupTests.js
+├── diagrama_arquitectura.md
+├── diagrama_de_flujo.md
+├── package.json
+├── vite.config.js
+└── README.md
 ```
+
+## Stack tecnológico
+
+| Área | Tecnología |
+|---|---|
+| Biblioteca UI | React 19 |
+| Empaquetador | Vite 8 |
+| Lenguaje | JavaScript y JSX |
+| Estado | React Context y hooks |
+| Persistencia | `localStorage` |
+| Estilos | CSS3 |
+| Pruebas | Vitest, Testing Library y jest-axe |
+| Cobertura | @vitest/coverage-v8 |
 
 ## Requisitos
 
-- JDK 27.
-- Gradle Wrapper incluido en el proyecto.
-- PostgreSQL 16 o compatible.
-- Git.
+- Node.js 18 o superior.
+- npm 9 o superior.
+- Un backend REST disponible para registro e inicio de sesión.
 
-No es necesario instalar Gradle globalmente: el wrapper se ejecuta desde `gradlew.bat` en Windows o `./gradlew` en Linux/macOS.
-
-## Configuración de PostgreSQL
-
-La configuración predeterminada usa:
-
-| Parámetro | Valor |
-|---|---|
-| Host | `localhost` |
-| Puerto | `5435` |
-| Base de datos | `authdb` |
-| Usuario | `authuser` |
-| Contraseña | `authpass` |
-
-Ejemplo para crear la instancia con Docker:
-
-```bash
-docker run --name akuma-postgres ^
-  -e POSTGRES_DB=authdb ^
-  -e POSTGRES_USER=authuser ^
-  -e POSTGRES_PASSWORD=authpass ^
-  -p 5435:5432 ^
-  -d postgres:16
-```
-
-En PowerShell, los saltos de línea deben usar el carácter `` ` ``:
+## Instalación y ejecución
 
 ```powershell
-docker run --name akuma-postgres `
-  -e POSTGRES_DB=authdb `
-  -e POSTGRES_USER=authuser `
-  -e POSTGRES_PASSWORD=authpass `
-  -p 5435:5432 `
-  -d postgres:16
+git clone <URL_DEL_REPOSITORIO>
+cd Akuma_tech_React-main
+npm install
+npm run dev
 ```
 
-Los parámetros pueden cambiarse en `src/main/resources/application.properties`.
+Vite iniciará la aplicación y mostrará la dirección local en la terminal, normalmente `http://localhost:5173`.
 
-> La configuración incluye el puerto `7778`, el secreto JWT y las credenciales de conexión. En un entorno real, estas credenciales deben cargarse mediante variables de entorno o secretos y no deben quedar en el repositorio.
+Para generar y revisar una compilación de producción:
 
-## Ejecución
-
-Desde la raíz del proyecto:
-
-```bash
-# Windows
-.\gradlew.bat bootRun
-
-# Linux/macOS
-./gradlew bootRun
+```powershell
+npm run build
+npm run preview
 ```
 
-La API quedará disponible en:
+## Configuración del backend
+
+Por defecto, el frontend consulta:
 
 ```text
-http://localhost:7778
+http://localhost:7778/api/auth
 ```
 
-También puede generarse y ejecutarse el JAR:
+Para usar otra dirección, crea `.env.local` en la raíz:
 
-```bash
-.\gradlew.bat build
-java -jar build/libs/tech-0.0.1-SNAPSHOT.jar
+```env
+VITE_API_URL=http://localhost:7778/api/auth
 ```
 
-## API REST
-
-Todos los endpoints forman parte del prefijo `/api/auth`.
+El contexto de sesión espera estos endpoints:
 
 | Método | Ruta | Descripción |
 |---|---|---|
-| `POST` | `/api/auth/register` | Registra un usuario y devuelve un JWT |
-| `POST` | `/api/auth/login` | Inicia sesión y devuelve un JWT |
-| `DELETE` | `/api/auth/delete/{email}` | Desactiva lógicamente un usuario |
+| `POST` | `/register` | Registra el usuario. |
+| `POST` | `/login` | Valida credenciales y devuelve un token. |
 
-### Registro
-
-```http
-POST http://localhost:7778/api/auth/register
-Content-Type: application/json
-
-{
-  "email": "usuario@duocuc.cl",
-  "password": "usuario123"
-}
-```
-
-Respuesta exitosa:
+Ejemplo conceptual del login:
 
 ```json
 {
-  "token": "<JWT>"
+  "email": "usuario@gmail.com",
+  "password": "1234"
 }
 ```
 
-El correo debe tener formato válido y la contraseña no puede estar vacía.
-
-### Inicio de sesión
-
-```http
-POST http://localhost:7778/api/auth/login
-Content-Type: application/json
-
-{
-  "email": "usuario@duocuc.cl",
-  "password": "usuario123"
-}
-```
-
-Respuesta exitosa:
+Respuesta esperada:
 
 ```json
 {
-  "token": "<JWT>"
+  "token": "jwt-o-token-generado"
 }
 ```
 
-### Eliminación lógica
+El nombre del repositorio puede contener documentación del backend anterior. Si se elimina esa implementación, actualiza esta sección y elimina los archivos de `backend/`.
 
-```http
-DELETE http://localhost:7778/api/auth/delete/usuario@duocuc.cl
-```
+## Catálogo y promociones
 
-La respuesta exitosa no incluye cuerpo. El usuario conserva su registro en la base de datos, pero queda marcado como inactivo y no podrá iniciar sesión.
+El catálogo inicial se encuentra en `src/data/productos.js`.
 
-### Códigos HTTP relevantes
-
-| Código | Situación |
+| Código | Descuento |
 |---|---|
-| `200 OK` | Login o eliminación completados |
-| `201` | Registro completado por defecto si se usa el controlador actual |
-| `400 Bad Request` | Email o contraseña inválidos |
-| `401 Unauthorized` | Credenciales incorrectas |
-| `404 Not Found` | Usuario no encontrado al eliminar |
-| `409 Conflict` | El correo ya está registrado |
+| `AKUMA10` | 10% |
+| `GAMER30` | 30% |
+| `BIENVENIDO15` | 15% |
+| `DESCUENTO5` | 5% |
+| `CYBERAKUMA40` | 40% |
 
-> El controlador devuelve actualmente `200 OK` para el registro; puede ajustarse a `201 Created` como mejora futura.
+Las opciones de envío son:
 
-## Modelo de datos
-
-Entidad `users`:
-
-| Campo | Tipo | Restricción |
-|---|---|---|
-| `id` | Long | Clave primaria autoincremental |
-| `username` | String | Único y obligatorio |
-| `email` | String | Único y obligatorio |
-| `password` | String | Contraseña cifrada con BCrypt |
-| `active` | Boolean | Activo por defecto |
-
-Hibernate usa `ddl-auto=update` y Flyway tiene habilitada la ubicación `classpath:db/migration`.
+| Método | Precio |
+|---|---|
+| Estándar | Gratis |
+| Express | $4.990 |
+| Same Day | $9.990 |
 
 ## Pruebas
 
-Ejecutar todas las pruebas:
-
-```bash
-# Windows
-.\gradlew.bat test
-
-# Linux/macOS
-./gradlew test
+```powershell
+npm test
+npm run test:watch
+npm run test:coverage
 ```
 
-El reporte HTML se genera en:
+El proyecto incluye pruebas para:
 
-```text
-build/reports/tests/test/index.html
-```
+- Validación de correo, contraseña, RUT y teléfono.
+- Lectura y escritura de `localStorage`.
+- Operaciones del carrito y descuentos.
+- Registro e inicio de sesión.
+- Renderizado de componentes.
+- Navegación entre vistas.
+- Formularios y acciones del usuario.
+- CRUD de productos y usuarios.
+- Accesibilidad con `jest-axe`.
 
-## Conexión con el frontend
+El reporte HTML de cobertura se genera en `coverage/index.html`.
 
-El frontend [AkumaTech React](https://github.com/rogodoyr/Akuma_tech_React) usa React, Vite y el contexto `SesionContext` para registrar e iniciar sesión.
+## Scripts disponibles
 
-Para una integración con este backend, el frontend debe enviar las solicitudes a `http://localhost:7778/api/auth` y guardar el JWT recibido. Una propuesta típica es:
+| Comando | Acción |
+|---|---|
+| `npm run dev` | Inicia Vite con recarga automática. |
+| `npm run build` | Genera la versión de producción en `dist/`. |
+| `npm run preview` | Sirve localmente la compilación de producción. |
+| `npm run lint` | Ejecuta ESLint. |
+| `npm test` | Ejecuta Vitest una sola vez. |
+| `npm run test:watch` | Ejecuta pruebas en modo observación. |
+| `npm run test:coverage` | Genera el informe de cobertura. |
 
-```text
-POST /api/auth/register
-POST /api/auth/login
-Authorization: Bearer <JWT>
-```
+## Documentación adicional
 
-Como Spring Security está configurado actualmente con `permitAll`, todos los endpoints son públicos. Antes de exponer el backend, debe agregarse un filtro JWT y reglas de autorización para rutas administrativas y protegidas.
+- [Arquitectura detallada](./diagrama_arquitectura.md)
+- [Flujos de navegación y compra](./diagrama_de_flujo.md)
 
-## Próximos pasos
+## Notas de implementación
 
-- Integrar el JWT en las rutas protegidas.
-- Agregar filtros de Spring Security.
-- Implementar refresh tokens.
-- Migrar los productos, carrito y pedidos desde `localStorage`.
-- Agregar roles para usuarios y administradores.
-- Agregar pruebas de integración con PostgreSQL o Testcontainers.
-- Crear configuración por perfiles (`dev`, `test`, `prod`) y usar variables de entorno.
-
-## Autoría
-
-Proyecto académico Fullstack II — Duoc UC.
+- La navegación es controlada por estado dentro de `App.jsx`; no existe configuración de React Router.
+- Los datos comerciales se almacenan localmente en el navegador.
+- Las imágenes alojadas externamente requieren conexión a Internet.
+- `node_modules/`, `dist/` y `coverage/` están excluidos por `.gitignore`.
+- El administrador por defecto utiliza `admin@gmail.com` y `admin123`, pero debe reemplazarse o gestionarse de forma segura al integrar un backend real.
