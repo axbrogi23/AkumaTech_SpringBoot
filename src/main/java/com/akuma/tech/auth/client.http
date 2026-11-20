@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:7778
+@baseUrl = http://localhost:7778/api/auth
 
 ### Registrar usuario semilla (Haz este primero)
 
