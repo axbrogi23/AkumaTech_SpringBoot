@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import jakarta.validation.Valid;
 
 
-@RequestMapping("/api/v1/auth") 
+@RequestMapping("/api/auth") 
 @RestController
 public class AuthController {
 
