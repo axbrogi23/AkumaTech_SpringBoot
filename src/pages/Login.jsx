@@ -11,7 +11,7 @@ function Login({ navegar }) {
   const [errorCorreo, setErrorCorreo] = useState('')
   const [errorPassword, setErrorPassword] = useState('')
 
-  function manejarSubmit(event) {
+  async function manejarSubmit(event) {
     event.preventDefault()
 
     // Limpiar mensajes anteriores
@@ -25,6 +25,7 @@ function Login({ navegar }) {
     if (errorCorreoTexto) {
       setErrorCorreo(errorCorreoTexto)
     }
+
     if (errorPasswordTexto) {
       setErrorPassword(errorPasswordTexto)
     }
@@ -33,8 +34,11 @@ function Login({ navegar }) {
       return
     }
 
-    // Intentar iniciar sesión
-    const resultado = iniciarSesion(correo.trim(), password)
+    // Intentar iniciar sesión mediante el backend
+    const resultado = await iniciarSesion(
+      correo.trim(),
+      password,
+    )
 
     if (resultado.ok) {
       alert(resultado.mensaje)
@@ -61,13 +65,11 @@ function Login({ navegar }) {
             required
             placeholder="Ingresa tu correo"
             value={correo}
-            onChange={function (e) {
-              setCorreo(e.target.value)
+            onChange={function (event) {
+              setCorreo(event.target.value)
             }}
           />
-          <p id="error-correo" className="mensaje-error">
-            {errorCorreo}
-          </p>
+          <p id="error-correo" className="mensaje-error">{errorCorreo}</p>
 
           {/* CONTRASEÑA */}
           <label htmlFor="password">Contraseña:</label>
@@ -80,8 +82,8 @@ function Login({ navegar }) {
             required
             placeholder="Ingresa tu contraseña"
             value={password}
-            onChange={function (e) {
-              setPassword(e.target.value)
+            onChange={function (event) {
+              setPassword(event.target.value)
             }}
           />
           <p id="error-password" className="mensaje-error">

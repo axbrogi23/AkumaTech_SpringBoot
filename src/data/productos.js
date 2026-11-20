@@ -122,13 +122,6 @@ export const productos = [
     precio: 129990,
     imagen: ssdSamsung,
     descripcion: 'SSD NVMe M.2 de alto rendimiento con capacidad de 1TB, ideal para sistemas de escritorio y portátiles.',
-  },
-  {
-    id: 15,
-    nombre: 'Monitor Gamer Curvo Samsung Odyssey G5 27" 165Hz',
-    precio: 165000,
-    imagen: "https://images.samsung.com/is/image/samsung/p6pim/latin/lc27g55tqwlxzp/gallery/latin-odyssey-g5-g55t-lc27g55tqwlxzp-546959962?$1164_776_PNG$",
-    descripcion: 'Monitor gamer curvo de 27 pulgadas con resolución QHD, tasa de refresco de 165Hz y tiempo de respuesta de 1ms.',
   }
 ]
 

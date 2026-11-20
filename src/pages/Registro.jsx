@@ -29,7 +29,7 @@ function Registro({ navegar }) {
     telefono: '',
   })
 
-  function manejarSubmit(event) {
+  async function manejarSubmit(event) {
     event.preventDefault()
 
     // Validar todos los campos
@@ -52,8 +52,8 @@ function Registro({ navegar }) {
       return
     }
 
-    // Registrar usuario
-    const resultado = registrarUsuario({
+    // Registrar usuario mediante el backend
+    const resultado = await registrarUsuario({
       nombre: nombre.trim(),
       rut: rut.trim(),
       correo: correo.trim(),
@@ -65,7 +65,10 @@ function Registro({ navegar }) {
       alert(resultado.mensaje)
       navegar('login')
     } else {
-      setErrores({ ...nuevosErrores, correo: resultado.mensaje })
+      setErrores({
+        ...nuevosErrores,
+        correo: resultado.mensaje,
+      })
     }
   }
 
@@ -85,8 +88,8 @@ function Registro({ navegar }) {
             required
             placeholder="Ingresa tu nombre completo"
             value={nombre}
-            onChange={function (e) {
-              setNombre(e.target.value)
+            onChange={function (event) {
+              setNombre(event.target.value)
             }}
           />
           <p id="error-nombre" className="mensaje-error">
@@ -102,8 +105,8 @@ function Registro({ navegar }) {
             required
             placeholder="Ejemplo: 12.345.678-9"
             value={rut}
-            onChange={function (e) {
-              setRut(e.target.value)
+            onChange={function (event) {
+              setRut(event.target.value)
             }}
           />
           <p id="error-rut" className="mensaje-error">
@@ -120,8 +123,8 @@ function Registro({ navegar }) {
             required
             placeholder="Ingresa tu correo"
             value={correo}
-            onChange={function (e) {
-              setCorreo(e.target.value)
+            onChange={function (event) {
+              setCorreo(event.target.value)
             }}
           />
           <p id="error-correo" className="mensaje-error">
@@ -139,8 +142,8 @@ function Registro({ navegar }) {
             required
             placeholder="Ingresa tu contraseña"
             value={password}
-            onChange={function (e) {
-              setPassword(e.target.value)
+            onChange={function (event) {
+              setPassword(event.target.value)
             }}
           />
           <p id="error-password" className="mensaje-error">
@@ -158,8 +161,8 @@ function Registro({ navegar }) {
             required
             placeholder="Confirma tu contraseña"
             value={confirmar}
-            onChange={function (e) {
-              setConfirmar(e.target.value)
+            onChange={function (event) {
+              setConfirmar(event.target.value)
             }}
           />
           <p id="error-confirmar-password" className="mensaje-error">
@@ -175,8 +178,8 @@ function Registro({ navegar }) {
             required
             placeholder="+569 12345678"
             value={telefono}
-            onChange={function (e) {
-              setTelefono(e.target.value)
+            onChange={function (event) {
+              setTelefono(event.target.value)
             }}
           />
           <p id="error-telefono" className="mensaje-error">

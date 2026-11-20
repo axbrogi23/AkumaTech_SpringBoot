@@ -1,9 +1,10 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import {leerStorage, guardarStorage, eliminarStorage, crearAdminPorDefecto,
-} from '../utils/storage'
+import {createContext, useContext, useEffect, useState,} from 'react'
+import {leerStorage, guardarStorage, eliminarStorage, crearAdminPorDefecto,} from '../utils/storage'
 
-// Contexto de sesión y usuarios
 const SesionContext = createContext(null)
+
+const API_URL =
+  import.meta.env.VITE_API_URL || 'http://localhost:7778/api/auth'
 
 export function SesionProvider({ children }) {
   const [sesion, setSesion] = useState(function () {
@@ -14,76 +15,121 @@ export function SesionProvider({ children }) {
     return leerStorage('usuarios', [])
   })
 
-  // Al cargar: crear admin por defecto y recargar usuarios
   useEffect(function () {
     crearAdminPorDefecto()
     setUsuarios(leerStorage('usuarios', []))
   }, [])
 
-  // Registrar un nuevo usuario
-  function registrarUsuario(datos) {
-    const lista = leerStorage('usuarios', [])
+  async function registrarUsuario(datos) {
+    try {
+      const respuesta = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: datos.correo,
+          password: datos.password,
+        }),
+      })
 
-    const correoExistente = lista.find(function (u) {
-      return u.correo === datos.correo
-    })
+      if (respuesta.status === 409) {
+        return {
+          ok: false,
+          mensaje: 'Este correo ya está registrado.',
+        }
+      }
 
-    if (correoExistente) {
-      return { ok: false, mensaje: 'Este correo ya está registrado.' }
+      if (!respuesta.ok) {
+        let mensaje = 'No fue posible registrar el usuario.'
+
+        try {
+          const error = await respuesta.json()
+
+          if (error.detail) {
+            mensaje = error.detail
+          }
+        } catch (error) {
+          // El backend no devolvió contenido JSON.
+        }
+
+        return {
+          ok: false,
+          mensaje: mensaje,
+        }
+      }
+
+      await respuesta.json()
+
+      return {
+        ok: true,
+        mensaje: '¡Registro exitoso! Ahora puedes iniciar sesión.',
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        mensaje: 'No fue posible conectar con el backend.',
+      }
     }
-
-    const nuevoUsuario = {
-      nombre: datos.nombre,
-      rut: datos.rut,
-      correo: datos.correo,
-      password: datos.password,
-      telefono: datos.telefono,
-      rol: 'usuario',
-    }
-
-    lista.push(nuevoUsuario)
-    guardarStorage('usuarios', lista)
-    setUsuarios(lista)
-
-    return { ok: true, mensaje: '¡Registro exitoso! Ahora puedes iniciar sesión.' }
   }
 
-  // Iniciar sesión
-  function iniciarSesion(correo, password) {
-    const lista = leerStorage('usuarios', [])
+  async function iniciarSesion(correo, password) {
+    try {
+      const respuesta = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: correo,
+          password: password,
+        }),
+      })
 
-    const usuarioEncontrado = lista.find(function (usuario) {
-      return usuario.correo === correo && usuario.password === password
-    })
+      if (!respuesta.ok) {
+        return {
+          ok: false,
+          mensaje: 'Correo o contraseña incorrectos.',
+        }
+      }
 
-    if (!usuarioEncontrado) {
-      return { ok: false, mensaje: 'Correo o contraseña incorrectos.' }
+      const datos = await respuesta.json()
+
+      const nombreUsuario = correo.split('@')[0]
+
+      const datosSesion = {
+        nombre: nombreUsuario,
+        correo: correo,
+        rol: 'usuario',
+        token: datos.token,
+      }
+
+      guardarStorage('sesionActiva', datosSesion)
+      localStorage.setItem('akuma_token', datos.token)
+      setSesion(datosSesion)
+
+      return {
+        ok: true,
+        mensaje: `¡Inicio de sesión exitoso! Bienvenido ${nombreUsuario}`,
+      }
+    } catch (error) {
+      return {
+        ok: false,
+        mensaje: 'No fue posible conectar con el backend.',
+      }
     }
-
-    const datosSesion = {
-      nombre: usuarioEncontrado.nombre,
-      correo: usuarioEncontrado.correo,
-      rol: usuarioEncontrado.rol || 'usuario',
-    }
-
-    guardarStorage('sesionActiva', datosSesion)
-    setSesion(datosSesion)
-
-    return { ok: true, mensaje: '¡Inicio de sesión exitoso! Bienvenido ' + usuarioEncontrado.nombre }
   }
 
-  // Cerrar sesión
   function cerrarSesion() {
     eliminarStorage('sesionActiva')
+    localStorage.removeItem('akuma_token')
     setSesion(null)
   }
 
-  // Verificar si es admin
   function esAdmin() {
     return sesion !== null && sesion.rol === 'admin'
   }
 
-  // Actualizar lista de usuarios (para admin)
   function guardarUsuarios(lista) {
     guardarStorage('usuarios', lista)
     setUsuarios(lista)
@@ -99,14 +145,21 @@ export function SesionProvider({ children }) {
     guardarUsuarios: guardarUsuarios,
   }
 
-  return <SesionContext.Provider value={valor}>{children}</SesionContext.Provider>
+  return (
+    <SesionContext.Provider value={valor}>
+      {children}
+    </SesionContext.Provider>
+  )
 }
 
-// Hook para usar la sesión desde cualquier componente
 export function useSesion() {
   const contexto = useContext(SesionContext)
+
   if (!contexto) {
-    throw new Error('useSesion debe usarse dentro de SesionProvider')
+    throw new Error(
+      'useSesion debe usarse dentro de SesionProvider',
+    )
   }
+
   return contexto
 }
