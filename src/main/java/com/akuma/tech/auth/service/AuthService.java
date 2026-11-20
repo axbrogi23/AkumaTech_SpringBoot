@@ -51,4 +51,14 @@ public class AuthService {
 
         return new AuthResponse(jwtService.generateToken(user.getEmail()));
     }
+
+
+    //endpoint para eliminar usuario
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmailAndActiveTrue(email)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
+
+        user.setActive(false); // Marcamos al usuario como inactivo
+        userRepository.save(user);
+    }
 }
