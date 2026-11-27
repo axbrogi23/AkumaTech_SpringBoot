@@ -53,6 +53,16 @@
         "description": "Inicia sesion con un usuario registrado y devuelve un JWT."
       },
       "response": []
+    },
+    {
+      "name": "Eliminar usuario",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": "{{baseUrl}}/delete/{{testEmail}}",
+        "description": "Desactiva al usuario asociado al correo indicado; no elimina el registro de la base de datos."
+      },
+      "response": []
     }
   ],
   "variable": [
