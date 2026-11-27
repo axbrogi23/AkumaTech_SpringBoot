@@ -6,11 +6,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.akuma.tech.auth.dto.AuthResponse;
 import com.akuma.tech.auth.dto.LoginRequest;
+import com.akuma.tech.auth.dto.UserResponse;
 import com.akuma.tech.auth.dto.RegisterRequest;
 import com.akuma.tech.auth.service.AuthService;
+
+import java.util.List;
 
 import jakarta.validation.Valid;
 
@@ -45,5 +49,10 @@ public class AuthController {
     @DeleteMapping("/delete/{email}")
     public void deleteUser(@PathVariable String email) {
         authService.deleteUser(email);
+    }
+    //metodo para obtener todos los usuarios
+    @GetMapping("/users")
+    public List<UserResponse> gettAllUsers()
+        return authservice.getAllUsers();
     }
 }
