@@ -1,0 +1,27 @@
+@baseUrl = http://localhost:7778/api/auth
+@email = prueba.akumatech@gmail.com
+@password = Prueba123!
+
+### Registrar usuario (usa un correo que no esté registrado)
+
+POST {{baseUrl}}/register
+Content-Type: application/json
+
+{
+  "email": "prueba.akumatech@gmail.com",
+  "password": "Prueba123!"
+}
+
+### Iniciar sesión (ejecuta después de registrar)
+
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+  "email": "prueba.akumatech@gmail.com",
+  "password": "Prueba123!"
+}
+
+### Eliminar usuario (lo desactiva; no borra el registro de la base de datos)
+
+DELETE {{baseUrl}}/delete/{{email}}
