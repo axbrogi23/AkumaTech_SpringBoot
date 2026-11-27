@@ -1,22 +1,23 @@
-# AkumaTech — tienda gamer
+# 🎮 AkumaTech — tienda gamer
 
-Aplicación académica Fullstack II para una tienda de productos tecnológicos y gamer. El proyecto tiene una interfaz React/Vite en la rama `main` y un backend Spring Boot en la rama `backend-axel`. La autenticación del frontend ya consume los endpoints de registro e inicio de sesión del backend.
+**Aplicación académica Fullstack II** para una tienda de productos tecnológicos y gamer.
 
-> **Estado actual:** la integración frontend-backend cubre registro y login. Los datos del catálogo, el carrito y los pedidos todavía se gestionan localmente en el navegador; no hay una API de productos o pedidos implementada.
+| Frontend | Backend | Persistencia |
+|---|---|---|
+| React + Vite (`main`) | Spring Boot (`backend-axel`) | PostgreSQL |
 
-## Contenidos
+La autenticación del frontend ya consume los endpoints de registro e inicio de sesión del backend.
 
-- [Funcionalidades](#funcionalidades)
-- [Arquitectura e integración](#arquitectura-e-integración)
-- [Tecnologías y requisitos](#tecnologías-y-requisitos)
-- [Ejecución del backend](#ejecución-del-backend)
-- [Ejecución del frontend](#ejecución-del-frontend)
-- [API de autenticación](#api-de-autenticación)
-- [Pruebas con Postman](#pruebas-con-postman)
-- [Persistencia](#persistencia)
-- [Pruebas automatizadas](#pruebas-automatizadas)
-- [Estructura del backend](#estructura-del-backend)
-- [Limitaciones y seguridad](#limitaciones-y-seguridad)
+> **Estado actual:** la integración entre frontend y backend cubre registro y login. El catálogo, el carrito y los pedidos se gestionan localmente en el navegador; todavía no existe una API para productos o pedidos.
+
+## 🧭 Contenido
+
+| Proyecto | Desarrollo | Datos y pruebas |
+|---|---|---|
+| [Funcionalidades](#funcionalidades) | [Tecnologías y requisitos](#tecnologías-y-requisitos) | [API de autenticación](#api-de-autenticación) |
+| [Arquitectura e integración](#arquitectura-e-integración) | [Ejecución del backend](#ejecución-del-backend) | [Pruebas con Postman y REST Client](#pruebas-con-postman-y-rest-client) |
+| [Estructura del backend](#estructura-del-backend) | [Ejecución del frontend](#ejecución-del-frontend) | [Persistencia](#persistencia) |
+| [Limitaciones y seguridad](#limitaciones-y-seguridad) | [Pruebas automatizadas](#pruebas-automatizadas) | |
 
 ## Funcionalidades
 
@@ -75,7 +76,7 @@ Necesitas un JDK compatible con Java 27 para el backend. Para el frontend, insta
 
 ## Ejecución del backend
 
-### 1. Obtener la rama
+### 1. 📥 Obtener la rama
 
 Desde PowerShell:
 
@@ -86,7 +87,7 @@ cd AkumaTech-backend
 
 Si ya tienes el repositorio, cambia a la carpeta que contiene `build.gradle` y `gradlew.bat`.
 
-### 2. Preparar PostgreSQL
+### 2. 🐘 Preparar PostgreSQL
 
 Inicia el servicio de PostgreSQL y conéctate a la base administrativa `postgres`, por ejemplo:
 
@@ -104,7 +105,7 @@ CREATE DATABASE authdb OWNER authuser;
 
 Si el rol ya existe, usa `ALTER ROLE authuser WITH LOGIN;` en lugar de `CREATE ROLE`. El puerto, usuario, contraseña y nombre de base deben coincidir con la configuración que use el backend.
 
-### 3. Configurar credenciales
+### 3. 🔐 Configurar credenciales
 
 No guardes contraseñas ni secretos JWT en Git. Spring Boot permite sobrescribir las propiedades mediante variables de entorno. En PowerShell, configúralas en la misma terminal desde la que iniciarás Gradle:
 
@@ -120,7 +121,7 @@ $env:SECURITY_JWT_SECRET = "<secreto-largo-y-aleatorio>"
 
 No publiques esos valores ni los incluyas en capturas. Las variables solo permanecen en esa sesión de PowerShell.
 
-### 4. Compilar e iniciar
+### 4. ▶️ Compilar e iniciar
 
 ```powershell
 .\gradlew.bat classes
@@ -182,7 +183,7 @@ Comportamiento esperado:
 - Login con usuario o contraseña incorrectos: `401 Unauthorized`.
 - Usuario inexistente al eliminar: `404 Not Found`.
 
-## Pruebas con Postman
+## Pruebas con Postman y REST Client
 
 La colección [AkumaTech-Auth.postman_collection.json](./AkumaTech-Auth.postman_collection.json) se puede importar desde **Postman → Import → Files**. Incluye solicitudes para registrar, iniciar sesión y desactivar un usuario. Usa estas variables editables:
 
@@ -190,9 +191,11 @@ La colección [AkumaTech-Auth.postman_collection.json](./AkumaTech-Auth.postman_
 - `testEmail`: correo de prueba.
 - `testPassword`: contraseña de prueba.
 
-Usa un correo nuevo para probar el registro. Si ya existe, prueba el login con esas credenciales o cambia `testEmail`. La solicitud de eliminación desactiva la cuenta y evita que ese usuario vuelva a iniciar sesión. No guardes tokens reales ni contraseñas personales en una colección que vayas a compartir.
+> **Flujo recomendado:** registra un correo nuevo, inicia sesión con esas credenciales y usa la solicitud de eliminación solo cuando quieras desactivar la cuenta. Si vuelves a registrar un correo existente, la API responde `409 Conflict`.
 
-También puedes usar [client.http](./client.http) desde VS Code con la extensión **REST Client**. El archivo contiene las mismas tres operaciones y permite editar `@baseUrl`, `@email` y `@password` al inicio. Usa **Send Request** sobre cada solicitud; registra primero, inicia sesión con esas credenciales y ejecuta la eliminación solo cuando quieras desactivar la cuenta.
+> **Seguridad:** no guardes tokens reales ni contraseñas personales en una colección que vayas a compartir.
+
+También puedes usar [client.http](./client.http) desde VS Code con la extensión **REST Client**. El archivo contiene las mismas tres operaciones y permite editar `@baseUrl`, `@email` y `@password` al inicio. Usa **Send Request** sobre la solicitud que quieras ejecutar.
 
 ## Persistencia
 
@@ -249,9 +252,9 @@ src/
 
 ## Limitaciones y seguridad
 
-- Spring Security actualmente permite todas las solicitudes (`permitAll`). El endpoint de eliminación no requiere autenticación y no debe exponerse a Internet.
-- El backend genera JWT, pero todavía no valida esos tokens en un filtro ni los utiliza para proteger rutas.
-- El rol `admin` y las operaciones administrativas del frontend son locales; el backend no implementa autorización por roles.
-- Productos, carrito y pedidos todavía no tienen persistencia ni API en el backend.
-- La migración inicial declara la columna `password_hash`, mientras que la entidad JPA mapea el campo `password` con el nombre predeterminado. Revisa y alinea el esquema/mapeo antes de crear una base de datos nueva exclusivamente a partir de esa migración.
-- No uses la configuración local ni credenciales de prueba en producción. Antes de desplegar, guarda secretos en variables de entorno/gestor de secretos, usa HTTPS, protege todos los endpoints y revisa las migraciones.
+- **Acceso:** Spring Security actualmente permite todas las solicitudes (`permitAll`). El endpoint de eliminación no requiere autenticación y no debe exponerse a Internet.
+- **JWT:** el backend genera tokens, pero todavía no los valida en un filtro ni los utiliza para proteger rutas.
+- **Roles:** el rol `admin` y las operaciones administrativas del frontend son locales; el backend no implementa autorización por roles.
+- **Datos:** productos, carrito y pedidos todavía no tienen persistencia ni API en el backend.
+- **Esquema:** la migración inicial declara la columna `password_hash`, mientras que la entidad JPA mapea el campo `password` con el nombre predeterminado. Revisa y alinea el esquema/mapeo antes de crear una base de datos nueva exclusivamente a partir de esa migración.
+- **Producción:** no uses la configuración local ni credenciales de prueba. Antes de desplegar, guarda secretos en variables de entorno o un gestor de secretos, usa HTTPS, protege todos los endpoints y revisa las migraciones.
