@@ -141,7 +141,9 @@ npm ci
 npm run dev
 ```
 
-Vite muestra la dirección local en la terminal, normalmente `http://localhost:5173`. El frontend usa por defecto la API en `http://localhost:7778/api/auth`. Para cambiarla, crea `.env.local` en la raíz del frontend:
+`npm ci` instala las dependencias del proyecto usando las versiones fijadas en `package-lock.json`. `npm run dev` inicia el servidor de desarrollo; Vite muestra la dirección local en la terminal, normalmente `http://localhost:5173`.
+
+El frontend usa por defecto la API en `http://localhost:7778/api/auth`. Para cambiarla, crea `.env.local` en la raíz del frontend:
 
 ```env
 VITE_API_URL=http://localhost:7778/api/auth
