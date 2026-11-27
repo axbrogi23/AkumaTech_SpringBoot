@@ -13,9 +13,10 @@ import jakarta.persistence.Table;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // PostgreSQL usará su autoincremento
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
+    @Column(name = "id", nullable = false, unique = true) 
     private Long id;
-
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -29,9 +30,11 @@ public class User {
     @Column(nullable = false)
     private boolean active = true;
 
+    //constructor sin parametros
     public User() {
     }
 
+    //constructor con parametros
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
