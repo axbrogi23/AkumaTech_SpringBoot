@@ -573,7 +573,6 @@ Las herramientas de testing permiten verificar componentes, validaciones, flujos
 **Asignatura:** Fullstack II  
 **Institución:** Duoc UC  
 **Tipo:** Proyecto académico Full Stack
----
 
 ## 👥 Miembros del equipo
 **Integrantes:** Axel Brogi, Rodrigo Godoy
