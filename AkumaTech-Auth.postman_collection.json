@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "e5270c19-48ee-4bdb-93a4-b11e89c106d4",
     "name": "AkumaTech - Autenticacion",
-    "description": "Solicitudes de registro e inicio de sesion para el backend local de AkumaTech.",
+    "description": "Solicitudes locales para registro, inicio de sesion y administracion protegida de usuarios en AkumaTech.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -50,7 +50,22 @@
           }
         },
         "url": "{{baseUrl}}/login",
-        "description": "Inicia sesion con un usuario registrado y devuelve un JWT."
+        "description": "Inicia sesion con testEmail y testPassword y devuelve un JWT. Si la cuenta es administradora, copia el token a adminToken para usar las solicitudes protegidas."
+      },
+      "response": []
+    },
+    {
+      "name": "Listar usuarios (admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
+        "url": "{{baseUrl}}/users",
+        "description": "Lista id, username, email y estado activo, incluidos usuarios inactivos. Requiere adminToken de una cuenta promovida manualmente a administradora en PostgreSQL. No devuelve contrasenas."
       },
       "response": []
     },
@@ -58,9 +73,14 @@
       "name": "Eliminar usuario",
       "request": {
         "method": "DELETE",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{adminToken}}"
+          }
+        ],
         "url": "{{baseUrl}}/delete/{{testEmail}}",
-        "description": "Desactiva al usuario asociado al correo indicado; no elimina el registro de la base de datos."
+        "description": "Desactiva al usuario asociado a testEmail; requiere adminToken y no elimina el registro. Usa solo datos de prueba."
       },
       "response": []
     }
@@ -80,6 +100,12 @@
       "key": "testPassword",
       "value": "Cambiar123!",
       "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string",
+      "description": "JWT de una cuenta con admin=true en PostgreSQL."
     }
   ]
 }

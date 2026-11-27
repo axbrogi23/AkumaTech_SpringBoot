@@ -1,5 +1,7 @@
 package com.akuma.tech.auth.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -8,9 +10,9 @@ import org.springframework.web.server.ResponseStatusException;
 import com.akuma.tech.auth.dto.AuthResponse;
 import com.akuma.tech.auth.dto.LoginRequest;
 import com.akuma.tech.auth.dto.RegisterRequest;
+import com.akuma.tech.auth.dto.UserResponse;
 import com.akuma.tech.auth.model.User;
 import com.akuma.tech.auth.repository.UserRepository;
-import com.akuma.tech.auth.service.JwtService;
 
 
 @Service
@@ -47,6 +49,7 @@ public class AuthService {
         user.setUsername(request.email()); // Usamos el email como username para Postgres
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setActive(true); // Aseguramos que se cree activo si es necesario
+        user.setAdmin(false);
         userRepository.save(user);
 
         return new AuthResponse(jwtService.generateToken(user.getEmail()));
@@ -62,15 +65,14 @@ public class AuthService {
         userRepository.save(user);
     }
 
-    //endpoint para mostrar todos los usuarios
-    public List<UserResponse> getAllUsers(){
+    public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
             .map(user -> new UserResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.isActive()
-                ))
-                .toList();
+            ))
+            .toList();
     }
 }

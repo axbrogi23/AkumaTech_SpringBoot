@@ -50,9 +50,10 @@ public class AuthController {
     public void deleteUser(@PathVariable String email) {
         authService.deleteUser(email);
     }
-    //metodo para obtener todos los usuarios
+
+    //endpoint para obtener todos los usuarios
     @GetMapping("/users")
-    public List<UserResponse> gettAllUsers()
-        return authservice.getAllUsers();
+    public List<UserResponse> getAllUsers() {
+        return authService.getAllUsers();
     }
 }

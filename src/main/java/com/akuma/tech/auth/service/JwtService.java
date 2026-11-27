@@ -12,10 +12,9 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-
-import jakarta.validation.Valid;
 
 @Service
 public class JwtService {
@@ -50,5 +49,14 @@ public class JwtService {
 			.expiration(Date.from(exp))
 			.signWith(signingKey)
 			.compact();
+	}
+
+	public String extractSubject(String token) {
+		Claims claims = Jwts.parser()
+			.verifyWith(signingKey)
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
+		return claims.getSubject();
 	}
 }
