@@ -1,27 +1,32 @@
 @baseUrl = http://localhost:7778/api/auth
-@email = prueba.akumatech@gmail.com
-@password = Prueba123!
+@email = admin-prueba@example.com //cuenta de prueba con admin=true en PostgreSQL
+@password = AdminPrueba123!
+@emailToDeactivate = usuario-prueba@example.com //cuenta de prueba para desactivar (opcional)
 
-### Registrar usuario (usa un correo que no esté registrado)
-
+### Registrar usuario (usa un correo nuevo)
+# @name register
 POST {{baseUrl}}/register
 Content-Type: application/json
 
 {
-  "email": "prueba.akumatech@gmail.com",
-  "password": "Prueba123!"
+  "email": "{{email}}",
+  "password": "{{password}}"
 }
 
-### Iniciar sesión (ejecuta después de registrar)
-
+### Iniciar sesión (usa una cuenta registrada)
+# @name login
 POST {{baseUrl}}/login
 Content-Type: application/json
 
 {
-  "email": "prueba.akumatech@gmail.com",
-  "password": "Prueba123!"
+  "email": "{{email}}",
+  "password": "{{password}}"
 }
 
-### Eliminar usuario (lo desactiva; no borra el registro de la base de datos)
+### Listar usuarios (requiere que la cuenta de @email tenga admin=true en PostgreSQL)
+GET {{baseUrl}}/users
+Authorization: Bearer {{login.response.body.$.token}}
 
-DELETE {{baseUrl}}/delete/{{email}}
+### Desactivar un usuario (opcional; usa solo una cuenta de prueba)
+DELETE {{baseUrl}}/delete/{{emailToDeactivate}}
+Authorization: Bearer {{login.response.body.$.token}}

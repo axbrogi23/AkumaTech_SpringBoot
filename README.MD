@@ -209,7 +209,7 @@ La colección [AkumaTech-Auth.postman_collection.json](./AkumaTech-Auth.postman_
 
 > **Seguridad:** no guardes tokens reales ni contraseñas personales en una colección que vayas a compartir.
 
-También puedes usar [client.http](./client.http) desde VS Code con la extensión **REST Client** para probar registro e inicio de sesión. El listado y la desactivación de usuarios se prueban desde Postman con el JWT de una cuenta administradora.
+También puedes usar [client.http](./client.http) desde VS Code con la extensión **REST Client** para probar registro, login, listado y desactivación. Edita sus variables de ejemplo. Las solicitudes de listado y desactivación reutilizan automáticamente el JWT de la solicitud `login`; la cuenta debe tener `admin = TRUE` en PostgreSQL. Usa una cuenta desechable para probar la desactivación.
 
 ## Persistencia
 

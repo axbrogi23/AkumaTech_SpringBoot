@@ -1,0 +1,140 @@
+{
+  "info": {
+    "_postman_id": "ea24a6ed-990d-4a4f-b17e-e0d1eb5e5cce",
+    "name": "AkumaTech - Autenticacion",
+    "description": "Solicitudes de registro e inicio de sesion para el backend local de AkumaTech.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53127235",
+    "_collection_link": "https://go.postman.co/collection/53127235-ea24a6ed-990d-4a4f-b17e-e0d1eb5e5cce?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Registrar usuario",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"prueba.akumatech@gmail.com\",\n  \"password\": \"Prueba123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "register"
+          ]
+        },
+        "description": "Crea un usuario. Usa un correo nuevo; si ya existe, el backend responde 409 Conflict."
+      },
+      "response": []
+    },
+    {
+      "name": "Iniciar sesion",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin-prueba@example.com\",\n  \"password\": \"AdminPrueba123!\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        },
+        "description": "Inicia sesion con un usuario registrado y devuelve un JWT."
+      },
+      "response": []
+    },
+    {
+      "name": "Eliminar usuario",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/delete/{{testEmail}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "delete",
+            "{{testEmail}}"
+          ]
+        },
+        "description": "Desactiva al usuario asociado al correo indicado; no elimina el registro de la base de datos."
+      },
+      "response": []
+    },
+    {
+      "name": "Obtener Usuarios",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:7778/api/auth/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "7778",
+          "path": [
+            "api",
+            "auth",
+            "users"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:7778/api/auth"
+    },
+    {
+      "key": "testEmail",
+      "value": "usuario.prueba@example.com"
+    },
+    {
+      "key": "testPassword",
+      "value": "Cambiar123!"
+    }
+  ]
+}
