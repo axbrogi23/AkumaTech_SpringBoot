@@ -575,6 +575,7 @@ Las herramientas de testing permiten verificar componentes, validaciones, flujos
 **Tipo:** Proyecto académico Full Stack
 **Integrantes:** Axel Brogi, Rodrigo Godoy
 
+
 ---
 
 **AkumaTech – Tecnología, rendimiento y gaming en un solo lugar.**
