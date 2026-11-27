@@ -575,7 +575,7 @@ Las herramientas de testing permiten verificar componentes, validaciones, flujos
 **Tipo:** Proyecto académico Full Stack
 
 ## 👥 Miembros del equipo
-**Integrantes:** Axel Brogi, Rodrigo Godoy
+**Integrantes:** Axel Brogi | Rodrigo Godoy
 
 
 ---
