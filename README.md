@@ -11,7 +11,7 @@ AkumaTech es una tienda web gamer desarrollada para el proyecto **Fullstack II -
 El proyecto está dividido por ramas:
 
 - [`main`](https://github.com/axbrogi23/AkumaTech_SpringBoot/tree/main): aplicación React.
-- [`backend-axel`](https://github.com/axbrogi23/AkumaTech_SpringBoot/tree/backend-axel): API de autenticación desarrollada con Spring Boot.
+- [`main`](https://github.com/axbrogi23/AkumaTech_Backend): API de autenticación y productos desarrollada con Spring Boot.
 
 ## Tabla de contenidos
 
