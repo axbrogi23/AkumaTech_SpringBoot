@@ -61,4 +61,16 @@ public class AuthService {
         user.setActive(false); // Marcamos al usuario como inactivo
         userRepository.save(user);
     }
+
+    //endpoint para mostrar todos los usuarios
+    public List<UserResponse> getAllUsers(){
+        return userRepository.findAll().stream()
+            .map(user -> new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.isActive()
+                ))
+                .toList();
+    }
 }
