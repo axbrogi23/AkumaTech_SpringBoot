@@ -156,7 +156,7 @@ Base URL local: `http://localhost:7778/api/auth`
 |---|---|---|
 | `POST` | `/register` | Registra un usuario y devuelve un JWT. |
 | `POST` | `/login` | Valida credenciales y devuelve un JWT. |
-| `DELETE` | `/delete/{email}` | Marca como inactivo al usuario asociado al correo. |
+| `DELETE` | `/delete/{email}` | Desactiva al usuario asociado al correo; no elimina el registro de la base de datos. |
 
 Los endpoints de registro y login reciben JSON con correo válido y contraseña no vacía:
 
@@ -184,15 +184,15 @@ Comportamiento esperado:
 
 ## Pruebas con Postman
 
-La colección [AkumaTech-Auth.postman_collection.json](./AkumaTech-Auth.postman_collection.json) se puede importar desde **Postman → Import → Files**. Incluye solicitudes de registro y login, y variables editables:
+La colección [AkumaTech-Auth.postman_collection.json](./AkumaTech-Auth.postman_collection.json) se puede importar desde **Postman → Import → Files**. Incluye solicitudes para registrar, iniciar sesión y desactivar un usuario. Usa estas variables editables:
 
 - `baseUrl`: dirección base de la API local.
 - `testEmail`: correo de prueba.
 - `testPassword`: contraseña de prueba.
 
-Usa un correo nuevo para probar el registro. Si ya existe, prueba el login con esas credenciales o cambia `testEmail`. No guardes tokens reales ni contraseñas personales en una colección que vayas a compartir.
+Usa un correo nuevo para probar el registro. Si ya existe, prueba el login con esas credenciales o cambia `testEmail`. La solicitud de eliminación desactiva la cuenta y evita que ese usuario vuelva a iniciar sesión. No guardes tokens reales ni contraseñas personales en una colección que vayas a compartir.
 
-También se pueden probar las solicitudes en `src/main/java/com/akuma/tech/auth/client.http` desde un cliente compatible con archivos `.http`; reemplaza sus datos de ejemplo por valores de prueba.
+También puedes usar [client.http](./client.http) desde VS Code con la extensión **REST Client**. El archivo contiene las mismas tres operaciones y permite editar `@baseUrl`, `@email` y `@password` al inicio. Usa **Send Request** sobre cada solicitud; registra primero, inicia sesión con esas credenciales y ejecuta la eliminación solo cuando quieras desactivar la cuenta.
 
 ## Persistencia
 
