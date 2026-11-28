@@ -7,6 +7,11 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 
+| Rama | Aplicación |
+|---|---|
+| [`main`](https://github.com/axbrogi23/AkumaTech_SpringBoot/tree/main) | Frontend React |
+| [`backend`](https://github.com/axbrogi23/AkumaTech_Backend/tree/main) | API Spring Boot |
+
 **AkumaTech** es una aplicación web de comercio electrónico enfocada en la venta de productos tecnológicos, componentes de computador y accesorios gaming.
 
 El proyecto fue desarrollado para la asignatura Fullstack II de Duoc UC y utiliza una arquitectura Full Stack, compuesta por un frontend desarrollado con React y una API REST desarrollada con Java y Spring Boot.
